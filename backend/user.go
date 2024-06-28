@@ -9,7 +9,7 @@ type UserSession struct {
 	ID uuid.UUID `json:"id"`
 }
 
-func NewUser(name string) *UserSession {
+func NewUser() *UserSession {
 	uuid, err := uuid.NewUUID()
 	if err != nil {
 		log.Fatal("failed to generate user uuid:", err)
