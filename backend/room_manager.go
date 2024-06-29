@@ -59,17 +59,6 @@ func (rm *RoomManager) JoinRoom(user *UserSession, roomId int64) {
 	}
 }
 
-func (rm *RoomManager) LeaveRoom(user *UserSession, roomId int64) {
-	if room := rm.GetRoomById(roomId); room == nil {
-		fmt.Printf("Room with id %d doesn't exist", roomId)
-	} else {
-		rm.Lock()
-		defer rm.Unlock()
-		room.addUser(user)
-		fmt.Printf("User %d joined room %d.", user.ID, roomId)
-	}
-}
-
 type contextKey string
 
 const userSessionKey = contextKey("userSession")
