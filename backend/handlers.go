@@ -62,7 +62,7 @@ func HandleGetRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
-	// _ := getUserSession(r.Context())
+	_ = getUserSession(r.Context())
 	c, err := websocket.Accept(w, r, &websocket.AcceptOptions{
 		OriginPatterns: []string{"localhost:5173"},
 	})

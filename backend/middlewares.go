@@ -19,7 +19,7 @@ func UserSessionMiddleware(next http.Handler) http.Handler {
 		if err == nil {
 			sessionID, err := uuid.Parse(cookie.Value)
 			if err == nil {
-				log.Printf("Resuming session %s!\n", sessionID)
+				log.Printf("Resuming session %s\n", sessionID)
 				session = &UserSession{ID: sessionID}
 			}
 		}

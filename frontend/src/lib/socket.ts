@@ -1,11 +1,11 @@
 localStorage.debug = '*';
-export const socket = new WebSocket("ws://localhost:8080")
+export const socket = new WebSocket("ws://localhost:8080") // TODO: Extract into env var
 
 socket.binaryType = "arraybuffer";
 
 // Events
-socket.addEventListener("open", (event) => {
-    let message_buffer = new Uint16Array(8)
+socket.addEventListener("open", (_) => {
+    let message_buffer = new Uint8Array(8)
     message_buffer[0] = 10
     socket.send(message_buffer);
 });
