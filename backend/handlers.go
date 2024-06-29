@@ -1,11 +1,15 @@
 package backend
 
 import (
+	"context"
 	"encoding/json"
-	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
+
+	"github.com/go-chi/chi/v5"
+	"nhooyr.io/websocket"
 )
 
 var rm = NewRoomManager()
@@ -55,4 +59,28 @@ func HandleGetRoom(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
+	// _ := getUserSession(r.Context())
+	c, err := websocket.Accept(w, r, &websocket.AcceptOptions{
+		OriginPatterns: []string{"localhost:5173"},
+	})
+	if err != nil {
+		log.Printf("Failed connecting to websocket: %v", err)
+	}
+	defer c.CloseNow()
+
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
+	defer cancel()
+
+	_, msg, err := c.Read(ctx)
+	if err != nil {
+		log.Printf("Failed reading from socket: %v", err)
+	}
+
+	log.Printf("Message: %v", msg)
+	msg = make([]byte, 5, 5)
+	msg[0] = 10
+	c.Write(ctx, websocket.MessageBinary, msg)
 }

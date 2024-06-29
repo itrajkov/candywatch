@@ -1,8 +1,10 @@
 package backend
 
 import (
-	"github.com/google/uuid"
+	"context"
 	"log"
+
+	"github.com/google/uuid"
 )
 
 type UserSession struct {
@@ -15,4 +17,16 @@ func NewUser() *UserSession {
 		log.Fatal("failed to generate user uuid:", err)
 	}
 	return &UserSession{uuid}
+}
+
+type contextKey string
+
+const userSessionKey = contextKey("userSession")
+
+func getUserSession(ctx context.Context) *UserSession {
+	session, ok := ctx.Value(userSessionKey).(*UserSession)
+	if !ok {
+		return nil
+	}
+	return session
 }
