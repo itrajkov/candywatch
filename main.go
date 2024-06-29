@@ -19,12 +19,13 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 		Handler:        r,
 	}
+	var roomManager = backend.NewRoomManager()
 
 	r.Use(backend.UserSessionMiddleware)
-	r.HandleFunc("/rooms", backend.HandleGetRooms)
-	r.HandleFunc("/rooms/new", backend.HandleNewRoom)
-	r.HandleFunc("/rooms/{id}", backend.HandleGetRoom)
-	r.HandleFunc("/", backend.HandleWebSocket)
+	r.HandleFunc("/rooms", roomManager.HandleGetRooms)
+	r.HandleFunc("/rooms/new", roomManager.HandleNewRoom)
+	r.HandleFunc("/rooms/{id}", roomManager.HandleGetRoom)
+	r.HandleFunc("/", roomManager.HandleWebSocket)
 
 	fmt.Printf("Starting server on port %s\n", s.Addr)
 	log.Fatal(s.ListenAndServe())

@@ -4,12 +4,21 @@ export const socket = new WebSocket("ws://localhost:8080") // TODO: Extract into
 socket.binaryType = "arraybuffer";
 
 // Events
-socket.addEventListener("open", (_) => {
-    let message_buffer = new Uint8Array(8)
-    message_buffer[0] = 10
-    socket.send(message_buffer);
-});
+// socket.addEventListener("open", (_) => {});
 
 socket.addEventListener("message", (event) => {
-    console.log("Message: ", event.data)
+    console.log("Server: ", event.data)
 });
+
+function isOpen(ws: WebSocket) { return ws.readyState === ws.OPEN }
+
+setInterval(() => {
+    let message_buffer = new Uint8Array(8)
+    message_buffer[0] = 1
+    if (isOpen(socket)) {
+        console.log("Me: ", message_buffer)
+        socket.send(message_buffer);
+    } else {
+        console.log("Socket is closed.")
+    }
+}, 1000)

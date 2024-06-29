@@ -20,7 +20,7 @@ func UserSessionMiddleware(next http.Handler) http.Handler {
 			sessionID, err := uuid.Parse(cookie.Value)
 			if err == nil {
 				log.Printf("Resuming session %s\n", sessionID)
-				session = &UserSession{ID: sessionID}
+				session = &UserSession{ID: &sessionID}
 			}
 		}
 

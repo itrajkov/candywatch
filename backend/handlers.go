@@ -1,20 +1,16 @@
 package backend
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 	"nhooyr.io/websocket"
 )
 
-var rm = NewRoomManager()
-
-func HandleNewRoom(w http.ResponseWriter, r *http.Request) {
+func (rm *RoomManager) HandleNewRoom(w http.ResponseWriter, r *http.Request) {
 	log.Println("Creating new room..")
 	room := rm.NewRoom()
 	log.Println("Room created..")
@@ -26,7 +22,7 @@ func HandleNewRoom(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func HandleGetRooms(w http.ResponseWriter, r *http.Request) {
+func (rm *RoomManager) HandleGetRooms(w http.ResponseWriter, r *http.Request) {
 	log.Println("Getting rooms..")
 	rooms := rm.GetRooms()
 	w.Header().Set("Content-Type", "application/json")
@@ -37,7 +33,7 @@ func HandleGetRooms(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func HandleGetRoom(w http.ResponseWriter, r *http.Request) {
+func (rm *RoomManager) HandleGetRoom(w http.ResponseWriter, r *http.Request) {
 	roomIdStr := chi.URLParam(r, "id")
 	log.Println(roomIdStr)
 	roomId, err := strconv.ParseInt(roomIdStr, 10, 64)
@@ -61,26 +57,16 @@ func HandleGetRoom(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
-	_ = getUserSession(r.Context())
+func (rm *RoomManager) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	c, err := websocket.Accept(w, r, &websocket.AcceptOptions{
 		OriginPatterns: []string{"localhost:5173"},
 	})
+
 	if err != nil {
 		log.Printf("Failed connecting to websocket: %v", err)
 	}
-	defer c.CloseNow()
 
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
-	defer cancel()
-
-	_, msg, err := c.Read(ctx)
-	if err != nil {
-		log.Printf("Failed reading from socket: %v", err)
-	}
-
-	log.Printf("Message: %v", msg)
-	msg = make([]byte, 5, 5)
-	msg[0] = 10
-	c.Write(ctx, websocket.MessageBinary, msg)
+	user := rm.getUserSession(r.Context())
+	user.ConnectSocket(c)
+	go user.readSocket()
 }
