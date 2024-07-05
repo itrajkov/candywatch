@@ -1,8 +1,6 @@
 package backend
 
 import (
-	"fmt"
-
 	"github.com/google/uuid"
 )
 
@@ -20,7 +18,6 @@ func NewSessionManager() *SessionManager {
 
 func (sm *SessionManager) GetUserSession(sessionID uuid.UUID) *UserSession {
 	for _, session := range sm.userSessions {
-		fmt.Printf("%+v\n", session)
 		if sessionID == *session.ID {
 			return &session
 		}

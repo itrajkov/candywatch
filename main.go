@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -33,7 +32,7 @@ func main() {
 	})
 	r.HandleFunc("/", roomManager.HandleWebSocket)
 
-	fmt.Printf("Starting server on port %s\n", s.Addr)
+	log.Printf("Starting server on port %s\n", s.Addr)
 	log.Fatal(s.ListenAndServe())
 
 }

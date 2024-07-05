@@ -76,11 +76,14 @@ func (rm *RoomManager) HandleJoinRoom(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid room ID", http.StatusBadRequest)
 		return
 	}
-
 	user := GetUserSession(r.Context())
+
+
+	log.Println("Trying to join room", roomIdStr)
 	room, err := rm.JoinRoom(user, roomId)
 	if err != nil {
-		if errors.Is(ErrRoomNoRoomFound, err) {
+		if errors.Is(ErrRoomNotFound, err) {
+			log.Println(err)
 			errorHandler(w, 404, fmt.Sprintf("Room not found."))
 			return
 		}

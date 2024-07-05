@@ -2,7 +2,6 @@ package backend
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -52,8 +51,6 @@ func UserSessionMiddleware(sessionManager *SessionManager) func(next http.Handle
 				}
 			}
 
-			fmt.Printf("UserSessionMiddleware: %+v\n", sessionManager.userSessions)
-			fmt.Printf("UserSessionMiddleware: %+v\n", session)
 			ctx := context.WithValue(r.Context(), UserSessionKey, session)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

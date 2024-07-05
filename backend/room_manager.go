@@ -6,12 +6,12 @@ import (
 )
 
 type RoomManager struct {
-	rooms map[int64]Room
+	rooms map[int64]*Room
 	sync.RWMutex
 }
 
 func NewRoomManager() *RoomManager {
-	return &RoomManager{rooms: make(map[int64]Room, 5)}
+	return &RoomManager{rooms: make(map[int64]*Room, 5)}
 }
 
 // returns a room given it's id
@@ -19,7 +19,7 @@ func NewRoomManager() *RoomManager {
 func (rm *RoomManager) GetRoomById(id int64) *Room {
 	for _, room := range rm.rooms {
 		if room.ID == id {
-			return &room
+			return room
 		}
 	}
 	return nil
@@ -37,29 +37,30 @@ func (rm *RoomManager) newRoomId() int64 {
 	return int64(num_rooms + 1)
 }
 
-func (rm *RoomManager) GetRooms() map[int64]Room {
+func (rm *RoomManager) GetRooms() map[int64]*Room {
 	return rm.rooms
 }
 
 func (rm *RoomManager) NewRoom() *Room {
-	room := &Room{rm.newRoomId(), make([]UserSession, 0)}
-	rm.rooms[room.ID] = *room
+	room := &Room{rm.newRoomId(), make([]*UserSession, 0)}
+	rm.rooms[room.ID] = room
 	return room
 }
 
-var ErrRoomNoRoomFound = fmt.Errorf("No such room")
+var ErrRoomNotFound = fmt.Errorf("No such room")
 
 func (rm *RoomManager) JoinRoom(user *UserSession, roomId int64) (room *Room, err error) {
 	room = rm.GetRoomById(roomId)
 	if room == nil {
-		return nil, fmt.Errorf("JoinRoom: %w", ErrRoomNoRoomFound)
+		return nil, ErrRoomNotFound
 	}
 
 	rm.Lock()
 	defer rm.Unlock()
-	room.addUser(user)
+	if room.getUser(*user.ID) == nil {
+		room.addUser(user)
+	}
 	return room, nil
 }
-
 
 // TODO: LeaveRoom() cleanup function to remove user from Room
