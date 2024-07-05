@@ -1,8 +1,6 @@
 package backend
 
 import (
-	"fmt"
-
 	"github.com/google/uuid"
 )
 
@@ -12,7 +10,7 @@ type Room struct {
 }
 
 func (r *Room) addUser(user *UserSession) {
-	fmt.Printf("Looking for a nulled out struct\n")
+	// Look for an empty object to re-use
 	for _, u := range r.Users {
 		if u.ID == nil {
 			*u = *user
@@ -20,7 +18,7 @@ func (r *Room) addUser(user *UserSession) {
 		}
 	}
 
-	fmt.Printf("Couldn't find an empty slot, appending..\n")
+	// If we don't find an empty one, append.
 	r.Users = append(r.Users, user)
 }
 
@@ -33,7 +31,7 @@ func (r *Room) removeUser(user *UserSession) {
 
 func (r *Room) getUser(sessionID uuid.UUID) *UserSession {
 	for _, user := range r.Users {
-		if *user.ID == sessionID {
+		if user.ID != nil && *user.ID == sessionID {
 			return user
 		}
 	}

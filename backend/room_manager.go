@@ -59,6 +59,7 @@ func (rm *RoomManager) JoinRoom(user *UserSession, roomId int64) (room *Room, er
 
 	rm.Lock()
 	defer rm.Unlock()
+	fmt.Printf("%+v\n", *user.ID)
 	if room.getUser(*user.ID) == nil {
 		room.addUser(user)
 	}
