@@ -48,12 +48,11 @@ func UserSessionMiddleware(sessionManager *SessionManager) func(next http.Handle
 				if session == nil {
 					log.Println("Creating new user session..")
 					session = NewUserSession(sessionID)
+					sessionManager.AddSession(*session)
 				}
-
-				log.Printf("Adding session %+v\n", session)
-				sessionManager.AddSession(*session)
 			}
 
+			fmt.Printf("UserSessionMiddleware: %+v\n", sessionManager.userSessions)
 			fmt.Printf("UserSessionMiddleware: %+v\n", session)
 			ctx := context.WithValue(r.Context(), UserSessionKey, session)
 			next.ServeHTTP(w, r.WithContext(ctx))

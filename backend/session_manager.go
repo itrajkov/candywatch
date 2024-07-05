@@ -6,7 +6,6 @@ import (
 	"github.com/google/uuid"
 )
 
-
 // TODO: This should be a database repository instead with small in-memory cache
 // postponed for later in development
 type SessionManager struct {
@@ -15,16 +14,21 @@ type SessionManager struct {
 
 func NewSessionManager() *SessionManager {
 	return &SessionManager {
-		userSessions: make([]UserSession, 2),
+		userSessions: make([]UserSession, 0),
 	}
 }
 
-func (rm *SessionManager) GetUserSession(sessionID uuid.UUID) *UserSession {
-	// TODO: Implement fetching the UserSession
-	fmt.Printf("GetUserSession: %s\n", sessionID)
+func (sm *SessionManager) GetUserSession(sessionID uuid.UUID) *UserSession {
+	for _, session := range sm.userSessions {
+		fmt.Printf("%+v\n", session)
+		if sessionID == *session.ID {
+			return &session
+		}
+	}
 	return nil
 }
 
 func (sm *SessionManager)AddSession(user UserSession) {
+	// TODO: Check if UserSession with that sessionID already exists
 	sm.userSessions = append(sm.userSessions, user)
 }
