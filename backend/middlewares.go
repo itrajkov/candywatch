@@ -44,10 +44,13 @@ func UserSessionMiddleware(sessionManager *SessionManager) func(next http.Handle
 					return
 				}
 
-				session := sessionManager.GetUserSession(sessionID)
+				session = sessionManager.GetUserSession(sessionID)
 				if session == nil {
+					log.Println("Creating new user session..")
 					session = NewUserSession(sessionID)
 				}
+
+				log.Printf("Adding session %+v\n", session)
 				sessionManager.AddSession(*session)
 			}
 

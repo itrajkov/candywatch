@@ -88,7 +88,6 @@ func (rm *RoomManager) HandleJoinRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Printf("%s joined %d.\n", user.ID.String(), roomId)
-
 	err = json.NewEncoder(w).Encode(room)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
