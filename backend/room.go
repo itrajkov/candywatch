@@ -1,6 +1,10 @@
 package backend
 
-import "github.com/google/uuid"
+import (
+	"fmt"
+
+	"github.com/google/uuid"
+)
 
 type Room struct {
 	ID    int64         `json:"id"`
@@ -8,11 +12,22 @@ type Room struct {
 }
 
 func (r *Room) addUser(user *UserSession) {
+	fmt.Printf("Looking for a nulled out struct\n")
+	for _, u := range r.Users {
+		if u.ID == nil {
+			*u = *user
+			return
+		}
+	}
+
+	fmt.Printf("Couldn't find an empty slot, appending..\n")
 	r.Users = append(r.Users, user)
 }
 
 func (r *Room) removeUser(user *UserSession) {
-	user.socket.CloseNow()
+	if user.socket != nil {
+		user.socket.CloseNow()
+	}
 	user.ID = nil
 }
 

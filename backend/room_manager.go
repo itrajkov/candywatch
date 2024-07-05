@@ -3,6 +3,8 @@ package backend
 import (
 	"fmt"
 	"sync"
+
+	"github.com/google/uuid"
 )
 
 type RoomManager struct {
@@ -63,4 +65,17 @@ func (rm *RoomManager) JoinRoom(user *UserSession, roomId int64) (room *Room, er
 	return room, nil
 }
 
-// TODO: LeaveRoom() cleanup function to remove user from Room
+func (rm *RoomManager) LeaveRoom(userID uuid.UUID, roomId int64) error {
+	room := rm.GetRoomById(roomId)
+	if room == nil {
+		return ErrRoomNotFound
+	}
+
+	rm.Lock()
+	defer rm.Unlock()
+	user := room.getUser(userID)
+	if user != nil {
+		room.removeUser(user)
+	}
+	return nil
+}

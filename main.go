@@ -28,7 +28,8 @@ func main() {
 		r.Get("/", roomManager.HandleGetRooms)
 		r.Post("/new", roomManager.HandleNewRoom)
 		r.Get("/{id}", roomManager.HandleGetRoom)
-		r.Post("/join/{id}", roomManager.HandleJoinRoom)
+		r.Post("/{id}/join", roomManager.HandleJoinRoom)
+		r.Post("/{id}/leave", roomManager.HandleLeaveRoom)
 	})
 	r.HandleFunc("/", roomManager.HandleWebSocket)
 

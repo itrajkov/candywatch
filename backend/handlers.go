@@ -98,6 +98,35 @@ func (rm *RoomManager) HandleJoinRoom(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (rm *RoomManager) HandleLeaveRoom(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	roomIdStr := chi.URLParam(r, "id")
+	roomId, err := strconv.ParseInt(roomIdStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid room ID", http.StatusBadRequest)
+		return
+	}
+	// TODO: Find a way to make these two refer to the same object
+	user := GetUserSession(r.Context())
+	err = rm.LeaveRoom(*user.ID, roomId)
+	if err != nil {
+		if errors.Is(ErrRoomNotFound, err) {
+			log.Println(err)
+			errorHandler(w, 404, fmt.Sprintf("Room not found."))
+			return
+		}
+		errorHandler(w, 500, fmt.Sprintf("Unknown server error"))
+		return
+	}
+	log.Printf("%s left %d.\n", user.ID.String(), roomId)
+	err = json.NewEncoder(w).Encode(NewResponse("Left room successfully.", "ok"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+
 func (rm *RoomManager) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	c, err := websocket.Accept(w, r, &websocket.AcceptOptions{
 		OriginPatterns: []string{"localhost:5173"},

@@ -4,6 +4,7 @@ type Response struct {
 	Message string `json:"message"`
 	Status  string `json:"status"`
 }
+
 type ErrorResponse struct{ Response }
 
 func NewErrorResponse(msg string) *ErrorResponse {
@@ -11,4 +12,11 @@ func NewErrorResponse(msg string) *ErrorResponse {
 		Message: msg,
 		Status:  "error",
 	}}
+}
+
+func NewResponse(msg string, status string) *Response {
+	return &Response{
+		Message: msg,
+		Status:  status,
+	}
 }
