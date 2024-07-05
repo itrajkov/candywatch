@@ -4,10 +4,10 @@ import "context"
 
 type contextKey string
 
-const userSessionKey = contextKey("userSession")
+const UserSessionKey = contextKey("userSession")
 
 func GetUserSession(ctx context.Context) *UserSession {
-	session, ok := ctx.Value(userSessionKey).(*UserSession)
+	session, ok := ctx.Value(UserSessionKey).(*UserSession)
 	if !ok {
 		return nil
 	}

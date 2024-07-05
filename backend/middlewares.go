@@ -52,7 +52,7 @@ func UserSessionMiddleware(sessionManager *SessionManager) func(next http.Handle
 			}
 
 			fmt.Printf("UserSessionMiddleware: %+v\n", session)
-			ctx := context.WithValue(r.Context(), userSessionKey, session)
+			ctx := context.WithValue(r.Context(), UserSessionKey, session)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
