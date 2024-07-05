@@ -6,9 +6,6 @@ type Room struct {
 }
 
 func (r *Room) addUser(user *UserSession) {
-	if len(r.users) == cap(r.users) {
-		r.users = make([]UserSession, 2*len(r.users))
-	}
 	r.users = append(r.users, *user)
 }
 

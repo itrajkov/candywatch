@@ -2,6 +2,7 @@ package backend
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -9,34 +10,51 @@ import (
 	"github.com/google/uuid"
 )
 
-func UserSessionMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func UserSessionMiddleware(sessionManager *SessionManager) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			var session *UserSession
 
-		log.Println("Getting session..")
-		cookie, err := r.Cookie("session_id")
-		var session *UserSession
+			log.Println("Getting session cookie..")
+			cookie, err := r.Cookie("session_id")
 
-		if err == nil {
-			sessionID, err := uuid.Parse(cookie.Value)
-			if err == nil {
-				log.Printf("Resuming session %s\n", sessionID)
-				session = &UserSession{ID: &sessionID}
+			if err != nil {
+				log.Println("No session cookie found, creating new session..")
+				sessionID, err := uuid.NewUUID()
+				if err != nil {
+					log.Fatal("failed to generate user sessionID:", err)
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+
+				http.SetCookie(w, &http.Cookie{
+					Name:    "session_id",
+					Value:   sessionID.String(),
+					Expires: time.Now().Add(24 * time.Hour),
+				})
+
+				session = NewUserSession(sessionID)
+				sessionManager.AddSession(*session)
+				log.Printf("New session created %s!\n", sessionID)
+			} else {
+				log.Println("Parsing cookie as UUID")
+				sessionID, err := uuid.Parse(cookie.Value)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+
+				session := sessionManager.GetUserSession(sessionID)
+				if session == nil {
+					session = NewUserSession(sessionID)
+				}
+				sessionManager.AddSession(*session)
 			}
-		}
 
-		if session == nil {
-			log.Println("No session found, creating new session..")
-			session = NewUser()
-			session_id := session.ID.String()
-			http.SetCookie(w, &http.Cookie{
-				Name:    "session_id",
-				Value:   session_id,
-				Expires: time.Now().Add(24 * time.Hour),
-			})
-			log.Printf("New session created %s!\n", session_id)
-		}
+			fmt.Printf("UserSessionMiddleware: %+v\n", session)
+			ctx := context.WithValue(r.Context(), userSessionKey, session)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
 
-		ctx := context.WithValue(r.Context(), userSessionKey, session)
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
 }

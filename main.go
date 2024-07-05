@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/itrajkov/candywatch/backend"
 )
 
@@ -19,12 +20,17 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 		Handler:        r,
 	}
-	var roomManager = backend.NewRoomManager()
+	roomManager := backend.NewRoomManager()
+	sessionManager := backend.NewSessionManager()
 
-	r.Use(backend.UserSessionMiddleware)
-	r.HandleFunc("/rooms", roomManager.HandleGetRooms)
-	r.HandleFunc("/rooms/new", roomManager.HandleNewRoom)
-	r.HandleFunc("/rooms/{id}", roomManager.HandleGetRoom)
+	r.Use(backend.UserSessionMiddleware(sessionManager))
+	r.Use(middleware.Logger)
+	r.Route("/rooms", func(r chi.Router) {
+		r.Get("/", roomManager.HandleGetRooms)
+		r.Post("/new", roomManager.HandleNewRoom)
+		r.Get("/{id}", roomManager.HandleGetRoom)
+		r.Post("/join/{id}", roomManager.HandleJoinRoom)
+	})
 	r.HandleFunc("/", roomManager.HandleWebSocket)
 
 	fmt.Printf("Starting server on port %s\n", s.Addr)

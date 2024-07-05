@@ -13,11 +13,7 @@ type UserSession struct {
 	socket *websocket.Conn
 }
 
-func NewUser() *UserSession {
-	uuid, err := uuid.NewUUID()
-	if err != nil {
-		log.Fatal("failed to generate user uuid:", err)
-	}
+func NewUserSession(uuid uuid.UUID) *UserSession {
 	return &UserSession{ID: &uuid}
 }
 
@@ -33,6 +29,7 @@ func (u *UserSession) SendMessage(ctx context.Context, msg Message) {
 func (u *UserSession) readSocket() {
 	log.Printf("Starting reading for user %s", u.ID.String())
 	defer func() { u.socket.CloseNow() }()
+
 	for {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()

@@ -1,7 +1,6 @@
 package backend
 
 import (
-	"context"
 	"fmt"
 	"sync"
 )
@@ -43,30 +42,24 @@ func (rm *RoomManager) GetRooms() map[int64]Room {
 }
 
 func (rm *RoomManager) NewRoom() *Room {
-	room := &Room{rm.newRoomId(), make([]UserSession, 5)}
+	room := &Room{rm.newRoomId(), make([]UserSession, 0)}
 	rm.rooms[room.ID] = *room
 	return room
 }
 
-func (rm *RoomManager) JoinRoom(user *UserSession, roomId int64) {
-	if room := rm.GetRoomById(roomId); room == nil {
-		fmt.Printf("Room with id %d doesn't exist", roomId)
-	} else {
-		rm.Lock()
-		defer rm.Unlock()
-		room.addUser(user)
-		fmt.Printf("User %d joined room %d.", user.ID, roomId)
+var ErrRoomNoRoomFound = fmt.Errorf("No such room")
+
+func (rm *RoomManager) JoinRoom(user *UserSession, roomId int64) (room *Room, err error) {
+	room = rm.GetRoomById(roomId)
+	if room == nil {
+		return nil, fmt.Errorf("JoinRoom: %w", ErrRoomNoRoomFound)
 	}
+
+	rm.Lock()
+	defer rm.Unlock()
+	room.addUser(user)
+	return room, nil
 }
 
-type contextKey string
 
-const userSessionKey = contextKey("userSession")
-
-func (rm *RoomManager) getUserSession(ctx context.Context) *UserSession {
-	session, ok := ctx.Value(userSessionKey).(*UserSession)
-	if !ok {
-		return nil
-	}
-	return session
-}
+// TODO: LeaveRoom() cleanup function to remove user from Room
