@@ -8,12 +8,13 @@ import (
 )
 
 type RoomManager struct {
-	rooms map[int64]*Room
+	rooms       map[int64]*Room
+	userRoomMap map[*UserSession]*Room
 	sync.RWMutex
 }
 
 func NewRoomManager() *RoomManager {
-	return &RoomManager{rooms: make(map[int64]*Room, 5)}
+	return &RoomManager{rooms: make(map[int64]*Room, 5), userRoomMap: make(map[*UserSession]*Room)}
 }
 
 // returns a room given it's id
@@ -63,6 +64,7 @@ func (rm *RoomManager) JoinRoom(user *UserSession, roomId int64) (room *Room, er
 	if room.getUser(*user.ID) == nil {
 		room.addUser(user)
 	}
+	rm.userRoomMap[user] = room
 	return room, nil
 }
 
@@ -78,5 +80,6 @@ func (rm *RoomManager) LeaveRoom(userID uuid.UUID, roomId int64) error {
 	if user != nil {
 		room.removeUser(user)
 	}
+	rm.userRoomMap[user] = room
 	return nil
 }
