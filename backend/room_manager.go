@@ -60,11 +60,10 @@ func (rm *RoomManager) JoinRoom(user *UserSession, roomId int64) (room *Room, er
 
 	rm.Lock()
 	defer rm.Unlock()
-	fmt.Printf("%+v\n", *user.ID)
 	if room.getUser(*user.ID) == nil {
 		room.addUser(user)
+		rm.userRoomMap[user] = room
 	}
-	rm.userRoomMap[user] = room
 	return room, nil
 }
 
@@ -82,4 +81,8 @@ func (rm *RoomManager) LeaveRoom(userID uuid.UUID, roomId int64) error {
 	}
 	rm.userRoomMap[user] = room
 	return nil
+}
+
+func (rm *RoomManager) GetUserRoom(user *UserSession) *Room {
+	return rm.userRoomMap[user]
 }

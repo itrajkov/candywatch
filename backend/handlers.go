@@ -138,5 +138,6 @@ func (rm *RoomManager) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	user := GetUserSession(r.Context())
 	user.ConnectSocket(c)
-	go user.readSocket()
+	room := rm.GetUserRoom(user)
+	go user.readSocket(room)
 }
