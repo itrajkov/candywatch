@@ -118,7 +118,6 @@ func (rm *RoomManager) HandleLeaveRoom(w http.ResponseWriter, r *http.Request) {
 		errorHandler(w, 500, fmt.Sprintf("Unknown server error"))
 		return
 	}
-	log.Printf("%s left %d.\n", user.ID.String(), roomId)
 	err = json.NewEncoder(w).Encode(NewResponse("Left room successfully.", "ok"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

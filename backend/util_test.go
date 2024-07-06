@@ -23,6 +23,10 @@ func TestGetUserSession(t *testing.T) {
 
 	got := session.ID.String()
 	if got != expected.ID.String() {
-		t.Errorf("got: %s expected: %+v", got, expected )
+		t.Errorf("got: %s expected: %+v", got, expected)
 	}
+}
+
+func TestThis() {
+
 }
