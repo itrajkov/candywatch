@@ -33,8 +33,9 @@ func UserSessionMiddleware(sessionManager *SessionManager) func(next http.Handle
 				})
 
 				session = NewUserSession(sessionID)
-				sessionManager.AddSession(*session)
+				sessionManager.AddSession(session)
 				log.Printf("New session created %s!\n", sessionID)
+				log.Printf("SessionManager state: %+v", sessionManager)
 			} else {
 				log.Println("Parsing cookie as UUID")
 				sessionID, err := uuid.Parse(cookie.Value)
@@ -47,8 +48,9 @@ func UserSessionMiddleware(sessionManager *SessionManager) func(next http.Handle
 				if session == nil {
 					log.Println("Creating new user session..")
 					session = NewUserSession(sessionID)
-					sessionManager.AddSession(*session)
+					sessionManager.AddSession(session)
 				}
+				log.Printf("SessionManager state: %+v", sessionManager)
 			}
 
 			ctx := context.WithValue(r.Context(), UserSessionKey, session)
