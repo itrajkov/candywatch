@@ -26,6 +26,7 @@ func (sm *SessionManager) GetUserSession(sessionID uuid.UUID) *UserSession {
 }
 
 func (sm *SessionManager)AddSession(user *UserSession) {
-	// TODO: Check if UserSession with that sessionID already exists
-	sm.userSessions = append(sm.userSessions, user)
+	if sm.GetUserSession(*user.ID) == nil {
+		sm.userSessions = append(sm.userSessions, user)
+	}
 }
