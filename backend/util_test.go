@@ -8,7 +8,7 @@ import (
 )
 
 func TestGetUserSession(t *testing.T) {
-	session_id, err := uuid.NewUUID()
+	session_id, err := uuid.NewRandom()
 	if err != nil {
 		t.Errorf("Failed generating a UUID.")
 	}

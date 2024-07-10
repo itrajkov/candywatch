@@ -62,6 +62,7 @@ func (rm *RoomManager) JoinRoom(user *UserSession, roomId uuid.UUID) (room *Room
 	fmt.Printf("USER: %+v\n", user)
 	rm.Lock()
 	if room.getUser(*user.ID) == nil {
+		// TODO: Check if user is already in a room and if yes leave it.
 		room.addUser(user)
 		rm.userRoomMap[user] = room
 	}

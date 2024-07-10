@@ -12,7 +12,7 @@ type Room struct {
 }
 
 func NewRoom() *Room {
-	roomId, err := uuid.NewUUID()
+	roomId, err := uuid.NewRandom()
 	if err != nil {
 		log.Fatal("Failed generating a UUID.")
 	}

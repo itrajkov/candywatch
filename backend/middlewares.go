@@ -19,7 +19,7 @@ func UserSessionMiddleware(sessionManager *SessionManager) func(next http.Handle
 
 			if err != nil {
 				log.Println("No session cookie found, creating new session..")
-				sessionID, err := uuid.NewUUID()
+				sessionID, err := uuid.NewRandom()
 				if err != nil {
 					log.Fatal("failed to generate user sessionID:", err)
 					http.Error(w, err.Error(), http.StatusInternalServerError)
