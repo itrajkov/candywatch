@@ -28,6 +28,7 @@ func UserSessionMiddleware(sessionManager *SessionManager) func(next http.Handle
 
 				http.SetCookie(w, &http.Cookie{
 					Name:    "session_id",
+					Path: "/",
 					Value:   sessionID.String(),
 					Expires: time.Now().Add(24 * time.Hour),
 				})
