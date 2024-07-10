@@ -15,7 +15,7 @@ func GetUserSession(ctx context.Context) *UserSession {
 }
 
 func RemoveIndex[T any](s []T, idx int)  []T {
-	ret := make([]T, len(s))
+	ret := make([]T, 0)
 	ret = append(ret, s[:idx]...)
 	ret = append(ret, s[idx+1:]...)
 	return ret
