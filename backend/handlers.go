@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	"nhooyr.io/websocket"
 )
 
@@ -24,8 +24,11 @@ func errorHandler(w http.ResponseWriter, status int, msg string) {
 
 func (rm *RoomManager) HandleNewRoom(w http.ResponseWriter, r *http.Request) {
 	log.Println("Creating new room..")
-	room := rm.NewRoom()
-	log.Println("Room created..")
+	room := NewRoom()
+	log.Println("Room created!")
+	log.Println("Adding room to room manager...")
+	rm.AddRoom(room)
+	log.Println("Room added!")
 	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(room)
 	if err != nil {
@@ -47,7 +50,7 @@ func (rm *RoomManager) HandleGetRooms(w http.ResponseWriter, r *http.Request) {
 
 func (rm *RoomManager) HandleGetRoom(w http.ResponseWriter, r *http.Request) {
 	roomIdStr := chi.URLParam(r, "id")
-	roomId, err := strconv.ParseInt(roomIdStr, 10, 64)
+	roomId, err := uuid.Parse(roomIdStr)
 	if err != nil {
 		http.Error(w, "Invalid room ID", http.StatusBadRequest)
 		return
@@ -71,13 +74,12 @@ func (rm *RoomManager) HandleGetRoom(w http.ResponseWriter, r *http.Request) {
 func (rm *RoomManager) HandleJoinRoom(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	roomIdStr := chi.URLParam(r, "id")
-	roomId, err := strconv.ParseInt(roomIdStr, 10, 64)
+	roomId, err := uuid.Parse(roomIdStr)
 	if err != nil {
 		http.Error(w, "Invalid room ID", http.StatusBadRequest)
 		return
 	}
 	user := GetUserSession(r.Context())
-
 
 	log.Println("Trying to join room", roomIdStr)
 	room, err := rm.JoinRoom(user, roomId)
@@ -101,7 +103,7 @@ func (rm *RoomManager) HandleJoinRoom(w http.ResponseWriter, r *http.Request) {
 func (rm *RoomManager) HandleLeaveRoom(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	roomIdStr := chi.URLParam(r, "id")
-	roomId, err := strconv.ParseInt(roomIdStr, 10, 64)
+	roomId, err := uuid.Parse(roomIdStr)
 	if err != nil {
 		http.Error(w, "Invalid room ID", http.StatusBadRequest)
 		return
@@ -124,7 +126,6 @@ func (rm *RoomManager) HandleLeaveRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-
 
 func (rm *RoomManager) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	c, err := websocket.Accept(w, r, &websocket.AcceptOptions{

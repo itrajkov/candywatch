@@ -47,7 +47,6 @@ func (u *UserSession) readSocket(room *Room) {
 			for _, user := range room.Users {
 				log.Printf("Propagating to %+v..\n", msg.sender.ID.String())
 				user.SendMessage(ctx, msg)
-				// msg.sender.SendMessage(ctx, msg)
 			}
 		}
 	}

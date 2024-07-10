@@ -13,3 +13,10 @@ func GetUserSession(ctx context.Context) *UserSession {
 	}
 	return session
 }
+
+func RemoveIndex[T any](s []T, idx int)  []T {
+	ret := make([]T, len(s))
+	ret = append(ret, s[:idx]...)
+	ret = append(ret, s[idx+1:]...)
+	return ret
+}

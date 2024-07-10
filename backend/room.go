@@ -1,12 +1,23 @@
 package backend
 
 import (
+	"log"
+
 	"github.com/google/uuid"
 )
 
 type Room struct {
-	ID    int64         `json:"id"`
+	ID    uuid.UUID      `json:"id"`
 	Users []*UserSession `json:"users"`
+}
+
+func NewRoom() *Room {
+	roomId, err := uuid.NewUUID()
+	if err != nil {
+		log.Fatal("Failed generating a UUID.")
+	}
+	room := &Room{roomId, make([]*UserSession, 0)}
+	return room
 }
 
 func (r *Room) addUser(user *UserSession) {
@@ -23,13 +34,16 @@ func (r *Room) addUser(user *UserSession) {
 }
 
 func (r *Room) removeUser(user *UserSession) {
-	if user.socket != nil {
-		user.socket.CloseNow()
+	for i, u := range r.Users {
+		if u.ID == user.ID {
+			r.Users = RemoveIndex(r.Users, i)
+			return
+		}
 	}
-	user.ID = nil
 }
 
 func (r *Room) getUser(sessionID uuid.UUID) *UserSession {
+	log.Printf("Users state: %v", r.Users)
 	for _, user := range r.Users {
 		if user.ID != nil && *user.ID == sessionID {
 			return user
