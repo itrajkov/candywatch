@@ -4,7 +4,10 @@ import { uuidValidateV4 } from "./util";
 export async function createRoom(): Promise<Room> {
     try {
         let url = `${import.meta.env.VITE_API_URL}/rooms/new`;
-        const response = await fetch(url, { method: "POST" });
+        const response = await fetch(url, {
+            method: "POST",
+            credentials: 'include'
+        });
         if (!response.ok) {
             throw new Error("Failed to create a room.")
         }
@@ -24,7 +27,9 @@ export async function joinRoom(roomId: string): Promise<Room> {
 
     try {
         let url = `${import.meta.env.VITE_API_URL}/rooms/${roomId}/join`;
-        const response = await fetch(url, { method: "POST" });
+        const response = await fetch(url, {
+            method: "POST", credentials: 'include'
+        });
         if (!response.ok) {
             throw new Error("Failed to join room.")
         }

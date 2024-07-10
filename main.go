@@ -24,7 +24,7 @@ func main() {
 	sessionManager := backend.NewSessionManager()
 	roomManager := backend.NewRoomManager()
 
-	r.Use(cors.Handler(cors.Options{AllowedOrigins: []string{"https://*", "http://*"}}))
+	r.Use(cors.Handler(cors.Options{AllowedOrigins: []string{"https://*", "http://*"}, AllowCredentials: true}))
 	r.Use(backend.UserSessionMiddleware(sessionManager))
 	r.Use(middleware.Logger)
 

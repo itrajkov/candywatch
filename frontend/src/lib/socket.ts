@@ -1,5 +1,5 @@
 localStorage.debug = '*';
-export const socket = new WebSocket("ws://localhost:8080") // TODO: Extract into env var
+export const socket = new WebSocket(import.meta.env.VITE_WS_URL)
 
 socket.binaryType = "arraybuffer";
 
