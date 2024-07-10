@@ -20,12 +20,14 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 		Handler:        r,
 	}
-	roomManager := backend.NewRoomManager()
+
 	sessionManager := backend.NewSessionManager()
+	roomManager := backend.NewRoomManager()
 
 	r.Use(cors.Handler(cors.Options{AllowedOrigins: []string{"https://*", "http://*"}}))
 	r.Use(backend.UserSessionMiddleware(sessionManager))
 	r.Use(middleware.Logger)
+
 	r.Route("/rooms", func(r chi.Router) {
 		r.Get("/", roomManager.HandleGetRooms)
 		r.Post("/new", roomManager.HandleNewRoom)

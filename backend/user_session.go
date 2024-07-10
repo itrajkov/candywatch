@@ -23,11 +23,19 @@ func (u *UserSession) ConnectSocket(c *websocket.Conn) {
 
 func (u *UserSession) SendMessage(ctx context.Context, msg Message) {
 	log.Printf("To %s: %v", u.ID, msg.payload)
+	if u.socket == nil {
+		log.Printf("Socket of user %s not connected", u.ID)
+		return
+	}
 	u.socket.Write(ctx, websocket.MessageBinary, msg.payload)
 }
 
 func (u *UserSession) readSocket(room *Room) {
 	log.Printf("Starting reading for user %s", u.ID.String())
+	if u.socket == nil {
+		log.Printf("Socket of user %s not connected", u.ID)
+		return
+	}
 	defer func() { u.socket.CloseNow() }()
 
 	for {
