@@ -12,13 +12,12 @@ socket.addEventListener("message", (event) => {
 
 function isOpen(ws: WebSocket) { return ws.readyState === ws.OPEN }
 
-setInterval(() => {
-    let message_buffer = new Uint8Array(8)
-    message_buffer[0] = 1
-    if (isOpen(socket)) {
-        console.log("Me: ", message_buffer)
-        socket.send(message_buffer);
-    } else {
-        console.log("Socket is closed.")
-    }
-}, 1000)
+// setInterval(() => {
+//     let message_buffer = new Uint8Array(8)
+//     message_buffer[0] = 1
+//     if (isOpen(socket)) {
+//         socket.send(message_buffer);
+//     } else {
+//         console.log("Socket is closed.")
+//     }
+// }, 1000)

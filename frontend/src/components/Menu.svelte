@@ -1,10 +1,15 @@
 <script lang="ts">
-    import { createRoom } from "../lib/api";
+    import { createRoom, joinRoom } from "../lib/api";
+    export async function createAndJoin() {
+        let room = await createRoom();
+        room = await joinRoom(room.id);
+        console.log(room)
+    }
 </script>
 
 <main>
     <div id="menu">
-        <button class="button" on:click={createRoom}>CREATE ROOM</button>
+        <button class="button" on:click={createAndJoin}>CREATE ROOM</button>
         <a class="button" href="/room/someid">JOIN ROOM</a>
         <!-- Not implemented -->
     </div>
