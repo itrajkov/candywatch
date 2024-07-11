@@ -55,18 +55,20 @@ var ErrRoomNotFound = fmt.Errorf("No such room")
 
 func (rm *RoomManager) JoinRoom(user *UserSession, roomId uuid.UUID) (room *Room, err error) {
 	current_room := rm.GetUserRoom(user)
+	room = rm.GetRoomById(roomId)
+
+	rm.Lock()
 	if current_room != nil {
 		log.Println("Leaving current room...")
 		current_room.removeUser(user)
+		rm.userRoomMap[user] = nil
 		log.Println("Current room left!")
 	}
 
-	room = rm.GetRoomById(roomId)
 	if room == nil {
 		return nil, ErrRoomNotFound
 	}
 
-	rm.Lock()
 	if room.GetUser(*user.ID) == nil {
 		room.addUser(user)
 		rm.userRoomMap[user] = room
@@ -86,7 +88,7 @@ func (rm *RoomManager) LeaveRoom(userID uuid.UUID, roomId uuid.UUID) error {
 	if user != nil {
 		room.removeUser(user)
 	}
-	rm.userRoomMap[user] = room
+	rm.userRoomMap[user] = nil
 	rm.Unlock()
 	return nil
 }

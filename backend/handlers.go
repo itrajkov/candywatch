@@ -92,6 +92,7 @@ func (rm *RoomManager) HandleJoinRoom(w http.ResponseWriter, r *http.Request) {
 		errorHandler(w, 500, fmt.Sprintf("Unknown server error"))
 		return
 	}
+
 	go user.readSocket()
 	user.room_ch <- room
 	log.Printf("%s joined %s.\n", user.ID.String(), roomId.String())
@@ -110,7 +111,6 @@ func (rm *RoomManager) HandleLeaveRoom(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid room ID", http.StatusBadRequest)
 		return
 	}
-	// TODO: Find a way to make these two refer to the same object
 	user := GetUserSession(r.Context())
 	err = rm.LeaveRoom(*user.ID, roomId)
 	user.room_ch <- nil
