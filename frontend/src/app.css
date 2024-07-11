@@ -1,8 +1,17 @@
+@font-face{
+  font-family: 'Pacifico';
+  src:local('Pacifico-Regular');
+  src: url("./fonts/Pacifico-Regular.ttf"), format("truetype");
+  font-weight:200;
+}
+
 body {
   margin: 0;
   display: flex;
   place-items: center;
+  background-color: #a0e7e5;
   justify-content: center;
   min-width: 320px;
   min-height: 100vh;
+  font-family: 'Pacifico';
 }

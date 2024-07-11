@@ -1,10 +1,10 @@
 <script lang="ts">
- import Menu from '../components/Menu.svelte'
+    import Menu from "../components/Menu.svelte";
 </script>
 
 <main>
-    <h1 id="title">candywatch</h1>
-    <Menu/>
+    <h1 id="title">Candywatch</h1>
+    <Menu />
 </main>
 
 <style>
@@ -15,7 +15,14 @@
     }
 
     #title {
-        font-size: 3rem;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-user-drag: none;
+        margin: 10;
+        font-family: "Pacifico", cursive;
+        font-size: 90px;
+        color: #f74040;
+        text-shadow: 5px 5px #ffffff;
+        text-align: center;
     }
-
 </style>
