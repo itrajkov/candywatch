@@ -1,5 +1,4 @@
 <script lang="ts">
- import { socket } from "../lib/socket";
  import Menu from '../components/Menu.svelte'
 </script>
 

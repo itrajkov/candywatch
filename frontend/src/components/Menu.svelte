@@ -1,5 +1,7 @@
 <script lang="ts">
     import { createRoom, joinRoom } from "../lib/api";
+    import { startWebsocket } from "../lib/socket";
+    let socket = startWebsocket();
     export async function createAndJoin() {
         let room = await createRoom();
         room = await joinRoom(room.id);
