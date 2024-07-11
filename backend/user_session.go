@@ -64,9 +64,7 @@ readLoop:
 					log.Printf("From %s: %v\n", msg.sender.ID.String(), msg.payload)
 					for _, user := range room.Users {
 						if user.ID != u.ID {
-							log.Printf("Propagating to %+v..\n", msg.sender.ID.String())
 							user.SendMessage(ctx, msg)
-							log.Println("Message sent!")
 						}
 					}
 				}
