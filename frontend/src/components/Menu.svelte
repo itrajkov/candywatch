@@ -1,16 +1,15 @@
 <script lang="ts">
     import { createRoom, joinRoom } from "../lib/api";
-    import { get } from "svelte/store";
     import { room } from "../lib/state";
-    import { push, pop, replace } from "svelte-spa-router";
-    import { onMount } from "svelte";
+    import { push } from "svelte-spa-router";
 
     async function createAndJoin() {
         try {
             let r = await createRoom();
             r = await joinRoom(r.id);
-            room.set(r);
-            push(`#/rooms/${$room.id}`)
+            console.log(r)
+            room.set(r)
+            push(`#/rooms/${r.id}`);
         } catch (error) {
             console.error("Failed to create and join room:", error);
         }
