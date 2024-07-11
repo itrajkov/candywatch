@@ -1,11 +1,24 @@
 <script lang="ts">
     import { createRoom, joinRoom } from "../lib/api";
     import { startWebsocket } from "../lib/socket";
-    let socket = startWebsocket();
-    export async function createAndJoin() {
-        let room = await createRoom();
-        room = await joinRoom(room.id);
-        console.log(room)
+    import { get } from "svelte/store";
+    import { room } from "../lib/state";
+    import { push, pop, replace } from "svelte-spa-router";
+    import { onMount, onDestroy } from "svelte";
+
+    onMount(() => {
+        startWebsocket();
+    });
+
+    async function createAndJoin() {
+        try {
+            let r = await createRoom();
+            r = await joinRoom(r.id);
+            room.set(r);
+            push(`#/rooms/${$room.id}`)
+        } catch (error) {
+            console.error("Failed to create and join room:", error);
+        }
     }
 </script>
 
