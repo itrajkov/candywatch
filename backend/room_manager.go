@@ -54,8 +54,12 @@ func (rm *RoomManager) GetRooms() []*Room {
 var ErrRoomNotFound = fmt.Errorf("No such room")
 
 func (rm *RoomManager) JoinRoom(user *UserSession, roomId uuid.UUID) (room *Room, err error) {
-	current_room := rm.GetUserRoom(user)
 	room = rm.GetRoomById(roomId)
+	if room == nil {
+		return nil, ErrRoomNotFound
+	}
+
+	current_room := rm.GetUserRoom(user)
 
 	rm.Lock()
 	if current_room != nil {
@@ -65,9 +69,6 @@ func (rm *RoomManager) JoinRoom(user *UserSession, roomId uuid.UUID) (room *Room
 		log.Println("Current room left!")
 	}
 
-	if room == nil {
-		return nil, ErrRoomNotFound
-	}
 
 	if room.GetUser(*user.ID) == nil {
 		room.addUser(user)

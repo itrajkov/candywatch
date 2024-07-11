@@ -81,7 +81,6 @@ func (rm *RoomManager) HandleJoinRoom(w http.ResponseWriter, r *http.Request) {
 	}
 	user := GetUserSession(r.Context())
 
-	log.Println("Trying to join room", roomIdStr)
 	room, err := rm.JoinRoom(user, roomId)
 	if err != nil {
 		if errors.Is(ErrRoomNotFound, err) {
