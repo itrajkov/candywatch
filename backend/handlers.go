@@ -136,8 +136,19 @@ func (rm *RoomManager) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Failed connecting to websocket: %v", err)
 	}
 
+
 	user := GetUserSession(r.Context())
 	user.ConnectSocket(c)
+	log.Println("websocket connected!")
+
 	room := rm.GetUserRoom(user)
-	go user.readSocket(room)
+	if room != nil {
+		ch := make(chan *Room)
+		go user.readSocket(ch)
+		ch <- room
+	} else {
+		log.Printf("Not in a room, goroutine not started. %s\n", user.ID)
+		return
+	}
+
 }

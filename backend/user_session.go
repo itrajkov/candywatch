@@ -30,26 +30,21 @@ func (u *UserSession) SendMessage(ctx context.Context, msg Message) {
 	u.socket.Write(ctx, websocket.MessageBinary, msg.payload)
 }
 
-func (u *UserSession) readSocket(room *Room) {
-	log.Printf("Starting reading for user %s\n", u.ID.String())
-	if room == nil {
-		log.Printf("Not in room, quitting goroutine. %s\n", u.ID)
-		return
-	}
+func (u *UserSession) readSocket(ch <-chan *Room) {
+	log.Printf("Starting reading for user %s.\n", u.ID.String())
 	if u.socket == nil {
 		log.Printf("Socket of user %s not connected.\n", u.ID)
 		return
 	}
+
 	defer func() {
-		userInRoom := room.GetUser(*u.ID)
-		if userInRoom != nil {
-			log.Printf("%s leaving room %s", u.ID, room.ID)
-			room.removeUser(u)
-		}
 		u.socket.CloseNow()
 	}()
 
 	for {
+		log.Printf("Getting room from channel %s", u.ID)
+		room := <-ch
+		log.Printf("Got room: %s", room.ID)
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		_, payload, err := u.socket.Read(ctx)
