@@ -3,8 +3,7 @@ export const socket = new WebSocket(import.meta.env.VITE_WS_URL)
 
 socket.binaryType = "arraybuffer";
 
-// Events
-// socket.addEventListener("open", (_) => {});
+socket.addEventListener("open", (_) => {console.log("Connected to websocket.")});
 
 socket.addEventListener("message", (event) => {
     console.log("Server: ", event.data)

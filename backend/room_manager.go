@@ -67,7 +67,7 @@ func (rm *RoomManager) JoinRoom(user *UserSession, roomId uuid.UUID) (room *Room
 	}
 
 	rm.Lock()
-	if room.getUser(*user.ID) == nil {
+	if room.GetUser(*user.ID) == nil {
 		room.addUser(user)
 		rm.userRoomMap[user] = room
 	}
@@ -82,7 +82,7 @@ func (rm *RoomManager) LeaveRoom(userID uuid.UUID, roomId uuid.UUID) error {
 	}
 
 	rm.Lock()
-	user := room.getUser(userID)
+	user := room.GetUser(userID)
 	if user != nil {
 		room.removeUser(user)
 	}

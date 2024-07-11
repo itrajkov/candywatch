@@ -31,12 +31,23 @@ func (u *UserSession) SendMessage(ctx context.Context, msg Message) {
 }
 
 func (u *UserSession) readSocket(room *Room) {
-	log.Printf("Starting reading for user %s", u.ID.String())
-	if u.socket == nil {
-		log.Printf("Socket of user %s not connected", u.ID)
+	log.Printf("Starting reading for user %s\n", u.ID.String())
+	if room == nil {
+		log.Printf("Not in room, quitting goroutine. %s\n", u.ID)
 		return
 	}
-	defer func() { u.socket.CloseNow() }()
+	if u.socket == nil {
+		log.Printf("Socket of user %s not connected.\n", u.ID)
+		return
+	}
+	defer func() {
+		userInRoom := room.GetUser(*u.ID)
+		if userInRoom != nil {
+			log.Printf("%s leaving room %s", u.ID, room.ID)
+			room.removeUser(u)
+		}
+		u.socket.CloseNow()
+	}()
 
 	for {
 		ctx, cancel := context.WithCancel(context.Background())
@@ -48,10 +59,9 @@ func (u *UserSession) readSocket(room *Room) {
 		}
 
 		msg := Message{sender: *u, payload: payload}
-
 		if msg.payload != nil && room != nil {
 			log.Printf("From %s: %v\n", msg.sender.ID.String(), msg.payload)
-			log.Printf("Propagating to room %v\n", room)
+			log.Printf("Propagating to room %s\n", room.ID.String())
 			for _, user := range room.Users {
 				log.Printf("Propagating to %+v..\n", msg.sender.ID.String())
 				user.SendMessage(ctx, msg)

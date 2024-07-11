@@ -1,5 +1,4 @@
 <script lang="ts">
-    // import { socket } from "./lib/socket";
     import Router from "svelte-spa-router";
     import Home from "./routes/Home.svelte";
     import Room from "./routes/Room.svelte";

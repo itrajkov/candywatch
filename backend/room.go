@@ -42,8 +42,7 @@ func (r *Room) removeUser(user *UserSession) {
 	}
 }
 
-func (r *Room) getUser(sessionID uuid.UUID) *UserSession {
-	log.Printf("Users state: %v", r.Users)
+func (r *Room) GetUser(sessionID uuid.UUID) *UserSession {
 	for _, user := range r.Users {
 		if user.ID != nil && *user.ID == sessionID {
 			return user
