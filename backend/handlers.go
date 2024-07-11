@@ -92,6 +92,8 @@ func (rm *RoomManager) HandleJoinRoom(w http.ResponseWriter, r *http.Request) {
 		errorHandler(w, 500, fmt.Sprintf("Unknown server error"))
 		return
 	}
+	go user.readSocket()
+	user.room_ch <- room
 	log.Printf("%s joined %s.\n", user.ID.String(), roomId.String())
 	err = json.NewEncoder(w).Encode(room)
 	if err != nil {
@@ -111,6 +113,7 @@ func (rm *RoomManager) HandleLeaveRoom(w http.ResponseWriter, r *http.Request) {
 	// TODO: Find a way to make these two refer to the same object
 	user := GetUserSession(r.Context())
 	err = rm.LeaveRoom(*user.ID, roomId)
+	user.room_ch <- nil
 	if err != nil {
 		if errors.Is(ErrRoomNotFound, err) {
 			log.Println(err)
@@ -143,9 +146,8 @@ func (rm *RoomManager) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	room := rm.GetUserRoom(user)
 	if room != nil {
-		ch := make(chan *Room)
-		go user.readSocket(ch)
-		ch <- room
+		go user.readSocket()
+		user.room_ch <- room
 	} else {
 		log.Printf("Not in a room, goroutine not started. %s\n", user.ID)
 		return

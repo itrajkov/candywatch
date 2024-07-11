@@ -9,12 +9,13 @@ import (
 )
 
 type UserSession struct {
-	ID     *uuid.UUID `json:"id"`
-	socket *websocket.Conn
+	ID      *uuid.UUID `json:"id"`
+	socket  *websocket.Conn
+	room_ch chan *Room
 }
 
 func NewUserSession(uuid uuid.UUID) *UserSession {
-	return &UserSession{ID: &uuid}
+	return &UserSession{ID: &uuid, room_ch: make(chan *Room)}
 }
 
 func (u *UserSession) ConnectSocket(c *websocket.Conn) {
@@ -30,7 +31,7 @@ func (u *UserSession) SendMessage(ctx context.Context, msg Message) {
 	u.socket.Write(ctx, websocket.MessageBinary, msg.payload)
 }
 
-func (u *UserSession) readSocket(ch <-chan *Room) {
+func (u *UserSession) readSocket() {
 	log.Printf("Starting reading for user %s.\n", u.ID.String())
 	if u.socket == nil {
 		log.Printf("Socket of user %s not connected.\n", u.ID)
@@ -41,25 +42,34 @@ func (u *UserSession) readSocket(ch <-chan *Room) {
 		u.socket.CloseNow()
 	}()
 
+	var room *Room
+readLoop:
 	for {
-		log.Printf("Getting room from channel %s", u.ID)
-		room := <-ch
-		log.Printf("Got room: %s", room.ID)
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
-		_, payload, err := u.socket.Read(ctx)
-		if err != nil {
-			log.Printf("Failed reading from socket: %v", err)
-			break
-		}
+		select {
+		case r := <-u.room_ch:
+			room = r
+		default:
+			{
 
-		msg := Message{sender: *u, payload: payload}
-		if msg.payload != nil && room != nil {
-			log.Printf("From %s: %v\n", msg.sender.ID.String(), msg.payload)
-			log.Printf("Propagating to room %s\n", room.ID.String())
-			for _, user := range room.Users {
-				log.Printf("Propagating to %+v..\n", msg.sender.ID.String())
-				user.SendMessage(ctx, msg)
+				ctx, cancel := context.WithCancel(context.Background())
+				defer cancel()
+				_, payload, err := u.socket.Read(ctx)
+				if err != nil {
+					log.Printf("Failed reading from socket: %v", err)
+					break readLoop
+				}
+
+				msg := Message{sender: *u, payload: payload}
+				if msg.payload != nil && room != nil {
+					log.Printf("From %s: %v\n", msg.sender.ID.String(), msg.payload)
+					for _, user := range room.Users {
+						if user.ID != u.ID {
+							log.Printf("Propagating to %+v..\n", msg.sender.ID.String())
+							user.SendMessage(ctx, msg)
+							log.Println("Message sent!")
+						}
+					}
+				}
 			}
 		}
 	}
