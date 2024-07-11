@@ -2,6 +2,12 @@
     import Router from "svelte-spa-router";
     import Home from "./routes/Home.svelte";
     import Room from "./routes/Room.svelte";
+    import { startWebsocket } from "./lib/socket";
+    import { onMount } from "svelte";
+
+    onMount(() => {
+        startWebsocket();
+    });
 
     const routes = {
         // Exact path

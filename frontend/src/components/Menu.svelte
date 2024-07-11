@@ -1,14 +1,9 @@
 <script lang="ts">
     import { createRoom, joinRoom } from "../lib/api";
-    import { startWebsocket } from "../lib/socket";
     import { get } from "svelte/store";
     import { room } from "../lib/state";
     import { push, pop, replace } from "svelte-spa-router";
-    import { onMount, onDestroy } from "svelte";
-
-    onMount(() => {
-        startWebsocket();
-    });
+    import { onMount } from "svelte";
 
     async function createAndJoin() {
         try {
