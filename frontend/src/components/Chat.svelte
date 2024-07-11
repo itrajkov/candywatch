@@ -1,15 +1,16 @@
 <script lang="ts">
     import { afterUpdate } from "svelte";
-    import ChatMessage from "./ChatMessage.svelte";
+    import { sendChatMessage, startWebsocket } from "../lib/socket";
+    import { chatMessages } from "../lib/state";
     import { getCookieValue } from "../lib/util";
-    import { sendChatMessage } from "../lib/socket";
-    import { chatMessages, ws } from "../lib/state";
+    import ChatMessage from "./ChatMessage.svelte";
+    let ws = startWebsocket();
     function sendMessage() {
         let msg = {
             userId: getCookieValue("session_id") || "",
             content: "hello world!",
         };
-        sendChatMessage($ws, msg);
+        sendChatMessage(ws, msg);
         chatMessages.update((currentMessages) => [...currentMessages, msg]);
     }
 
