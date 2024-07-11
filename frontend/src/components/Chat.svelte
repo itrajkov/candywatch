@@ -1,24 +1,12 @@
 <script lang="ts">
     import ChatMessage from "./ChatMessage.svelte";
-    function sendMessage() {
-        console.log("Sending message.");
-    }
     let messages = [
         { userId: "ivche", content: "hello world!" },
         { userId: "ivche", content: "hello world!" },
-        { userId: "ivche", content: "hello world!" },
-        { userId: "ivche", content: "hello world!" },
-        { userId: "ivche", content: "hello world!" },
-        { userId: "ivche", content: "hello world!" },
-        { userId: "ivche", content: "hello world!" },
-        { userId: "ivche", content: "hello world!" },
-        { userId: "ivche", content: "hello world!" },
-        { userId: "ivche", content: "hello world!" },
-        { userId: "ivche", content: "hello world!" },
-        { userId: "ivche", content: "hello world!" },
-        { userId: "ivche", content: "hello world!" },
-        { userId: "ivche", content: "hello world!" },
     ];
+    function sendMessage() {
+        messages = [...messages, { userId: "ivche", content: "hello world!" }];
+    }
 </script>
 
 <main>
@@ -31,7 +19,7 @@
             </ul>
         </div>
         <!-- TODO: Move this button to an input field component-->
-        <!-- <button id="sendBtn" class="button" on:click={sendMessage}>SEND</button> -->
+        <button id="sendBtn" class="button" on:click={sendMessage}>SEND</button>
     </div>
 </main>
 
