@@ -10,10 +10,11 @@ export function startWebsocket(): WebSocket {
     ws.binaryType = "arraybuffer"
 
     ws.onmessage = function (e) {
-        console.log("Server: ",)
         var enc = new TextDecoder();
-        let content = enc.decode(e.data);
+        let str = enc.decode(e.data);
+        let [userId, content] = str.split(":")
         let msg = { userId, content } as ChatMessage
+        console.log("Server: ", msg)
         handleChatMessage(msg)
     }
 
@@ -36,7 +37,7 @@ export function sendChatMessage(ws: WebSocket, message: ChatMessage) {
         return
     }
     if (isOpen(ws)) {
-        ws.send(message.content);
+        ws.send(`${message.userId}:${message.content}`);
     } else {
         console.log("Socket is closed.")
     }
