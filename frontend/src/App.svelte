@@ -3,10 +3,11 @@
     import Home from "./routes/Home.svelte";
     import Room from "./routes/Room.svelte";
     import { startWebsocket } from "./lib/socket";
+    import { ws } from "./lib/state";
     import { onMount } from "svelte";
 
     onMount(() => {
-        startWebsocket();
+        ws.set(startWebsocket());
     });
 
     const routes = {

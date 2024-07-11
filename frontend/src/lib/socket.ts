@@ -1,41 +1,45 @@
-localStorage.debug = '*';
+import { type ChatMessage } from "./interfaces"
+import { handleChatMessage } from "./socket_handlers"
+import { getCookieValue } from "./util";
 
+localStorage.debug = '*'
 
 export function startWebsocket(): WebSocket {
     let ws: WebSocket | null = new WebSocket('ws://localhost:8080')
-    ws.binaryType = "arraybuffer";
+    let userId = getCookieValue("session_id")
+    ws.binaryType = "arraybuffer"
 
-    ws.onmessage = function(e){
-        console.log("Server: ", e.data)
+    ws.onmessage = function (e) {
+        console.log("Server: ",)
+        var enc = new TextDecoder();
+        let content = enc.decode(e.data);
+        let msg = { userId, content } as ChatMessage
+        handleChatMessage(msg)
     }
 
 
-    ws.onopen = function(){
+    ws.onopen = function () {
         console.log("Connected to socket!")
     }
 
-    ws.onclose = function(){
+    ws.onclose = function () {
         console.log("Disonnected from socket!")
         ws = null
         setTimeout(startWebsocket, 1000)
     }
 
-
-    setInterval(() => {
-        let message_buffer = new Uint8Array(8)
-        message_buffer[0] = 1
-        if (ws == null) {
-            return
-        }
-        if (isOpen(ws)) {
-            ws.send(message_buffer);
-        } else {
-            ws
-            console.log("Socket is closed.")
-        }
-    }, 1000)
-
     return ws
 }
 
-function isOpen(ws: WebSocket) { return ws.readyState === ws.OPEN }
+export function sendChatMessage(ws: WebSocket, message: ChatMessage) {
+    if (ws == null) {
+        return
+    }
+    if (isOpen(ws)) {
+        ws.send(message.content);
+    } else {
+        console.log("Socket is closed.")
+    }
+}
+
+export function isOpen(ws: WebSocket) { return ws.readyState === ws.OPEN }

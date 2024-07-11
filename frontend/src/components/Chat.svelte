@@ -1,19 +1,29 @@
 <script lang="ts">
+    import { afterUpdate } from "svelte";
     import ChatMessage from "./ChatMessage.svelte";
-    let messages = [
-        { userId: "ivche", content: "hello world!" },
-        { userId: "ivche", content: "hello world!" },
-    ];
+    import { getCookieValue } from "../lib/util";
+    import { sendChatMessage } from "../lib/socket";
+    import { chatMessages, ws } from "../lib/state";
     function sendMessage() {
-        messages = [...messages, { userId: "ivche", content: "hello world!" }];
+        let msg = {
+            userId: getCookieValue("session_id") || "",
+            content: "hello world!",
+        };
+        sendChatMessage($ws, msg);
+        chatMessages.update((currentMessages) => [...currentMessages, msg]);
     }
+
+    let chat: HTMLDivElement;
+    afterUpdate(() => {
+        chat.scrollTop = chat.scrollHeight;
+    });
 </script>
 
 <main>
     <div id="box">
-        <div id="chat">
+        <div id="chat" bind:this={chat}>
             <ul id="chat-messages">
-                {#each messages as message}
+                {#each $chatMessages as message}
                     <ChatMessage {message} />
                 {/each}
             </ul>
@@ -35,6 +45,32 @@
         max-height: 40vh;
         border-radius: 25px;
         overflow-y: scroll;
+        scrollbar-width: none;
+    }
+
+    .button {
+        text-decoration: none;
+        padding: 10px;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 10px;
+        min-width: 30px;
+        min-height: 40px;
+        border-radius: 25px;
+        border: 0;
+        background-color: #f74040;
+        font-size: 1rem;
+        float: right;
+    }
+
+    .button:hover {
+        background-color: #ff0022;
+    }
+
+    .button:active {
+        scale: 0.95;
         scrollbar-width: none;
     }
 </style>
