@@ -4,11 +4,12 @@
     import { chatMessages } from "../lib/state";
     import { getCookieValue } from "../lib/util";
     import ChatMessage from "./ChatMessage.svelte";
+    import InputField from "./InputField.svelte";
     let ws = startWebsocket();
-    function sendMessage() {
+    function sendMessage(text: string) {
         let msg = {
             userId: getCookieValue("session_id") || "",
-            content: "hello world!",
+            content: text,
         };
         sendChatMessage(ws, msg);
         chatMessages.update((currentMessages) => [...currentMessages, msg]);
@@ -29,49 +30,27 @@
                 {/each}
             </ul>
         </div>
-        <!-- TODO: Move this button to an input field component-->
-        <button id="sendBtn" class="button" on:click={sendMessage}>SEND</button>
+        <InputField onButtonClick={sendMessage}/>
     </div>
 </main>
 
 <style>
     #chat {
+        margin: 10px;
         gap: 10px;
         display: flex;
         padding-bottom: 30px;
         flex-direction: column;
         background-color: #f74040;
-        min-width: 80vh;
-        min-height: 40vh;
-        max-height: 40vh;
+        min-height: 70vh;
+        max-height: 70vh;
         border-radius: 25px;
         overflow-y: scroll;
         scrollbar-width: none;
     }
 
-    .button {
-        text-decoration: none;
-        padding: 10px;
-        color: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin: 10px;
-        min-width: 30px;
-        min-height: 40px;
-        border-radius: 25px;
-        border: 0;
-        background-color: #f74040;
-        font-size: 1rem;
-        float: right;
-    }
-
-    .button:hover {
-        background-color: #ff0022;
-    }
-
-    .button:active {
-        scale: 0.95;
-        scrollbar-width: none;
+    #chat-messages {
+        margin: 0;
+        padding: 40px;
     }
 </style>

@@ -32,6 +32,7 @@ export function startWebsocket(): WebSocket {
     return ws
 }
 
+
 export function sendChatMessage(ws: WebSocket, message: ChatMessage) {
     if (ws == null) {
         return
