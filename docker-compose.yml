@@ -1,19 +1,21 @@
 services:
   frontend:
+    environment:
+      - VITE_API_URL=http://backend:8080
+      - VITE_WS_URL=ws://backend:8080
     image: candywatch-frontend
     build:
-        dockerfile: Dockerfile.frontend
+      dockerfile: Dockerfile.frontend
     ports:
       - "80:80"
     networks:
       - candywatch
-    environment:
-      - VITE_API_URL=http://localhost:8080
-      - VITE_WS_URL=ws://localhost:8080
+    depends_on:
+      - backend
   backend:
     image: candywatch-backend
     build:
-        dockerfile: Dockerfile.backend
+      dockerfile: Dockerfile.backend
     ports:
       - "8080:8080"
     networks:
