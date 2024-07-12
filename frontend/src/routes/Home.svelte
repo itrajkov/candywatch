@@ -1,5 +1,7 @@
 <script lang="ts">
     import Menu from "../components/Menu.svelte";
+    import {startWebsocket} from "../lib/socket";
+    startWebsocket();
 </script>
 
 <main>
