@@ -131,7 +131,7 @@ func (rm *RoomManager) HandleLeaveRoom(w http.ResponseWriter, r *http.Request) {
 
 func (rm *RoomManager) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	c, err := websocket.Accept(w, r, &websocket.AcceptOptions{
-		OriginPatterns: []string{"localhost:5173"},
+		OriginPatterns: []string{"localhost", "localhost:5173"}, // TODO: Pass these as env var
 	})
 
 	if err != nil {

@@ -1,12 +1,10 @@
 import { type ChatMessage } from "./interfaces"
 import { handleChatMessage } from "./socket_handlers"
-import { getCookieValue } from "./util";
 
 localStorage.debug = '*'
 
 export function startWebsocket(): WebSocket {
-    let ws: WebSocket | null = new WebSocket('ws://localhost:8080')
-    let userId = getCookieValue("session_id")
+    let ws: WebSocket | null = new WebSocket(import.meta.env.VITE_WS_URL)
     ws.binaryType = "arraybuffer"
 
     ws.onmessage = function (e) {
@@ -17,7 +15,6 @@ export function startWebsocket(): WebSocket {
         console.log("Server: ", msg)
         handleChatMessage(msg)
     }
-
 
     ws.onopen = function () {
         console.log("Connected to socket!")
