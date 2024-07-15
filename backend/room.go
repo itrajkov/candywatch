@@ -2,7 +2,6 @@ package backend
 
 import (
 	"log"
-
 	"github.com/google/uuid"
 )
 
@@ -20,7 +19,7 @@ func NewRoom() *Room {
 	return room
 }
 
-func (r *Room) addUser(user *UserSession) {
+func (r *Room) AddUser(user *UserSession) {
 	// Look for an empty object to re-use
 	for _, u := range r.Users {
 		if u.ID == nil {
@@ -28,12 +27,10 @@ func (r *Room) addUser(user *UserSession) {
 			return
 		}
 	}
-
-	// If we don't find an empty one, append.
 	r.Users = append(r.Users, user)
 }
 
-func (r *Room) removeUser(user *UserSession) {
+func (r *Room) RemoveUser(user *UserSession) {
 	for i, u := range r.Users {
 		if u.ID == user.ID {
 			r.Users = RemoveIndex(r.Users, i)

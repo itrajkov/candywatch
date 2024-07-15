@@ -5,33 +5,34 @@ import (
 	"log"
 
 	"github.com/google/uuid"
+	"github.com/itrajkov/candywatch/backend/dtos"
 	"nhooyr.io/websocket"
 )
 
 type UserSession struct {
 	ID      *uuid.UUID `json:"id"`
 	socket  *websocket.Conn
-	room_ch chan *Room
+	Room_ch chan *Room
 }
 
 func NewUserSession(uuid uuid.UUID) *UserSession {
-	return &UserSession{ID: &uuid, room_ch: make(chan *Room)}
+	return &UserSession{ID: &uuid, Room_ch: make(chan *Room)}
 }
 
 func (u *UserSession) ConnectSocket(c *websocket.Conn) {
 	u.socket = c
 }
 
-func (u *UserSession) SendMessage(ctx context.Context, msg Message) {
-	log.Printf("To %s: %v", u.ID, msg.payload)
+func (u *UserSession) SendMessage(ctx context.Context, msg dtos.Message) {
+	log.Printf("To %s: %v", u.ID, msg.Payload)
 	if u.socket == nil {
 		log.Printf("Socket of user %s not connected", u.ID)
 		return
 	}
-	u.socket.Write(ctx, websocket.MessageBinary, msg.payload)
+	u.socket.Write(ctx, websocket.MessageBinary, msg.Payload)
 }
 
-func (u *UserSession) readSocket() {
+func (u *UserSession) ReadSocket() {
 	log.Printf("Starting reading for user %s.\n", u.ID.String())
 	if u.socket == nil {
 		log.Printf("Socket of user %s not connected.\n", u.ID)
@@ -46,7 +47,7 @@ func (u *UserSession) readSocket() {
 readLoop:
 	for {
 		select {
-		case r := <-u.room_ch:
+		case r := <-u.Room_ch:
 			room = r
 		default:
 			{
@@ -59,9 +60,9 @@ readLoop:
 					break readLoop
 				}
 
-				msg := Message{sender: *u, payload: payload}
-				if msg.payload != nil && room != nil {
-					log.Printf("From %s: %v\n", msg.sender.ID.String(), msg.payload)
+				msg := dtos.Message{Sender: u.ID.String(), Payload: payload}
+				if msg.Payload != nil && room != nil {
+					log.Printf("From %s: %v\n", msg.Sender, msg.Payload)
 					for _, user := range room.Users {
 						if user.ID != u.ID {
 							user.SendMessage(ctx, msg)

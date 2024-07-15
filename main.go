@@ -9,6 +9,9 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/itrajkov/candywatch/backend"
+	"github.com/itrajkov/candywatch/backend/controllers"
+	"github.com/itrajkov/candywatch/backend/middlewares"
+	"github.com/itrajkov/candywatch/backend/services"
 )
 
 func main() {
@@ -22,20 +25,21 @@ func main() {
 	}
 
 	sessionManager := backend.NewSessionManager()
-	roomManager := backend.NewRoomManager()
+	roomService := services.NewRoomService()
+	roomController := controllers.RoomController{RoomsManager: roomService}
 
 	r.Use(cors.Handler(cors.Options{AllowedOrigins: []string{"https://*", "http://*"}, AllowCredentials: true}))
-	r.Use(backend.UserSessionMiddleware(sessionManager))
+	r.Use(middlewares.UserSessionMiddleware(sessionManager))
 	r.Use(middleware.Logger)
 
 	r.Route("/rooms", func(r chi.Router) {
-		r.Get("/", roomManager.HandleGetRooms)
-		r.Post("/new", roomManager.HandleNewRoom)
-		r.Get("/{id}", roomManager.HandleGetRoom)
-		r.Post("/{id}/join", roomManager.HandleJoinRoom)
-		r.Post("/{id}/leave", roomManager.HandleLeaveRoom)
+		r.Get("/", roomController.HandleGetRooms)
+		r.Post("/new", roomController.HandleNewRoom)
+		r.Get("/{id}", roomController.HandleGetRoom)
+		r.Post("/{id}/join", roomController.HandleJoinRoom)
+		r.Post("/{id}/leave", roomController.HandleLeaveRoom)
 	})
-	r.HandleFunc("/", roomManager.HandleWebSocket)
+	r.HandleFunc("/", roomController.HandleWebSocket)
 
 	log.Printf("Starting server on port %s\n", s.Addr)
 	log.Fatal(s.ListenAndServe())

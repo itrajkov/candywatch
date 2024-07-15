@@ -2,9 +2,12 @@ package backend
 
 import "context"
 
-type contextKey string
-
-const UserSessionKey = contextKey("userSession")
+func RemoveIndex[T any](s []T, idx int) []T {
+	ret := make([]T, 0)
+	ret = append(ret, s[:idx]...)
+	ret = append(ret, s[idx+1:]...)
+	return ret
+}
 
 func GetUserSession(ctx context.Context) *UserSession {
 	session, ok := ctx.Value(UserSessionKey).(*UserSession)
@@ -14,9 +17,6 @@ func GetUserSession(ctx context.Context) *UserSession {
 	return session
 }
 
-func RemoveIndex[T any](s []T, idx int)  []T {
-	ret := make([]T, 0)
-	ret = append(ret, s[:idx]...)
-	ret = append(ret, s[idx+1:]...)
-	return ret
-}
+type contextKey string
+
+const UserSessionKey = contextKey("userSession")

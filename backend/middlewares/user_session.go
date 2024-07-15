@@ -1,4 +1,4 @@
-package backend
+package middlewares
 
 import (
 	"context"
@@ -7,12 +7,13 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/itrajkov/candywatch/backend"
 )
 
-func UserSessionMiddleware(sessionManager *SessionManager) func(next http.Handler) http.Handler {
+func UserSessionMiddleware(sessionManager *backend.SessionManager) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			var session *UserSession
+			var session *backend.UserSession
 
 			log.Println("Getting session cookie..")
 			cookie, err := r.Cookie("session_id")
@@ -28,12 +29,12 @@ func UserSessionMiddleware(sessionManager *SessionManager) func(next http.Handle
 
 				http.SetCookie(w, &http.Cookie{
 					Name:    "session_id",
-					Path: "/",
+					Path:    "/",
 					Value:   sessionID.String(),
 					Expires: time.Now().Add(24 * time.Hour),
 				})
 
-				session = NewUserSession(sessionID)
+				session = backend.NewUserSession(sessionID)
 				sessionManager.AddSession(session)
 				log.Printf("New session created %s!\n", sessionID)
 				log.Printf("SessionManager state: %+v", sessionManager)
@@ -48,13 +49,13 @@ func UserSessionMiddleware(sessionManager *SessionManager) func(next http.Handle
 				session = sessionManager.GetUserSession(sessionID)
 				if session == nil {
 					log.Println("Creating new user session..")
-					session = NewUserSession(sessionID)
+					session = backend.NewUserSession(sessionID)
 					sessionManager.AddSession(session)
 				}
 				log.Printf("SessionManager state: %+v", sessionManager)
 			}
 
-			ctx := context.WithValue(r.Context(), UserSessionKey, session)
+			ctx := context.WithValue(r.Context(), backend.UserSessionKey, session)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

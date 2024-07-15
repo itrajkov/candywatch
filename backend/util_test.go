@@ -26,7 +26,3 @@ func TestGetUserSession(t *testing.T) {
 		t.Errorf("got: %s expected: %+v", got, expected)
 	}
 }
-
-func TestThis() {
-
-}

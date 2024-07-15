@@ -1,4 +1,4 @@
-package backend
+package dtos
 
 type Response struct {
 	Message string `json:"message"`
