@@ -26,6 +26,7 @@ $ cd candywatch && docker compose up --build
 - [x] Chat (within a room)
   - This sets most of the infrastructure in place for implementing the syncing protocol later.
 - [x] Dockerize app
+- [-] Write tests for existing features
 - [ ] Define Protocol spec
 - [ ] Protocol implementation
 - [ ] Youtube embed
