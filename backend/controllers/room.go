@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/itrajkov/candywatch/backend"
 	"github.com/itrajkov/candywatch/backend/dtos"
@@ -65,13 +65,19 @@ func (rc *RoomController) HandleGetRoom(w http.ResponseWriter, r *http.Request) 
 func (rc *RoomController) HandleJoinRoom(w http.ResponseWriter, r *http.Request) {
 	roomIdStr := chi.URLParam(r, "id")
 	roomId, err := uuid.Parse(roomIdStr)
+	log.Printf("Got room id: %s", roomId)
+
 	if err != nil {
 		http.Error(w, "Invalid room ID", http.StatusBadRequest)
 		return
 	}
-	user := backend.GetUserSession(r.Context())
 
-	room, err := rc.RoomsManager.JoinRoom(*user.ID, roomId)
+	user := backend.GetUserSession(r.Context())
+	log.Printf("Got user: %+v\n", user)
+
+
+	room, err := rc.RoomsManager.JoinRoom(user, roomId)
+
 	if err != nil {
 		if errors.Is(backend.ErrRoomNotFound, err) {
 			log.Println(err)
@@ -88,6 +94,7 @@ func (rc *RoomController) HandleJoinRoom(w http.ResponseWriter, r *http.Request)
 
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(room)
+	log.Printf("Got err: %+v\n", err)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

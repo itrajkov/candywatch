@@ -11,8 +11,8 @@ import (
 
 type UserSession struct {
 	ID      *uuid.UUID `json:"id"`
-	socket  *websocket.Conn
-	Room_ch chan *Room
+	socket  *websocket.Conn `json:"-"`
+	Room_ch chan *Room `json:"-"`
 }
 
 func NewUserSession(uuid uuid.UUID) *UserSession {

@@ -60,19 +60,19 @@ func (rs *RoomService) GetRooms() []*backend.Room {
 	return rooms
 }
 
-func (rs *RoomService) JoinRoom(userId uuid.UUID, roomId uuid.UUID) (room *backend.Room, err error) {
+func (rs *RoomService) JoinRoom(user *backend.UserSession, roomId uuid.UUID) (room *backend.Room, err error) {
+
 	room = rs.GetRoomById(roomId)
 	if room == nil {
 		return nil, backend.ErrRoomNotFound
 	}
 
-	user := room.GetUser(userId)
-	current_room := rs.GetUserRoom(*user.ID)
-
+	userId := *user.ID
+	current_room := rs.GetUserRoom(userId)
 	rs.Lock()
 	if current_room != nil {
 		log.Println("Leaving current room...")
-		current_room.RemoveUser(user)
+		current_room.RemoveUser(userId)
 		rs.userRoomMap[userId] = nil
 		log.Println("Current room left!")
 	}
@@ -94,7 +94,7 @@ func (rs *RoomService) LeaveRoom(userId uuid.UUID, roomId uuid.UUID) error {
 	rs.Lock()
 	user := room.GetUser(userId)
 	if user != nil {
-		room.RemoveUser(user)
+		room.RemoveUser(*user.ID)
 	}
 	rs.userRoomMap[userId] = nil
 	rs.Unlock()
