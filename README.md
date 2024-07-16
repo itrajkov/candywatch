@@ -1,7 +1,6 @@
 # Candywatch
 
-An app like [Watch2Gether](https://w2g.tv/en/) that allows for watching youtube with someone.
-It uses raw WebSockets with a custom protocol for syncing within the room.
+A youtube watchparty app
 
 # How to use?
 ## Clone the repository
