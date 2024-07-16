@@ -68,9 +68,11 @@ func (rs *RoomService) JoinRoom(user *backend.UserSession, roomId uuid.UUID) (ro
 	}
 
 	userId := *user.ID
+
 	current_room := rs.GetUserRoom(userId)
+
 	rs.Lock()
-	if current_room != nil {
+	if current_room != nil && current_room.ID != roomId {
 		log.Println("Leaving current room...")
 		current_room.RemoveUser(userId)
 		rs.userRoomMap[userId] = nil
@@ -81,6 +83,7 @@ func (rs *RoomService) JoinRoom(user *backend.UserSession, roomId uuid.UUID) (ro
 		room.AddUser(user)
 		rs.userRoomMap[userId] = room
 	}
+
 	rs.Unlock()
 	return room, nil
 }

@@ -17,7 +17,7 @@ export function startWebsocket(): WebSocket {
     }
 
     ws.onopen = function () {
-        console.log("Connected to socket!")
+        console.log("Connected to socket!", ws?.readyState)
     }
 
     ws.onclose = function () {

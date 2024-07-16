@@ -129,6 +129,7 @@ func (rc *RoomController) HandleLeaveRoom(w http.ResponseWriter, r *http.Request
 }
 
 func (rc *RoomController) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
+	log.Println("Handling websocket.")
 	c, err := websocket.Accept(w, r, &websocket.AcceptOptions{
 		OriginPatterns: []string{"localhost", "localhost:5173"}, // TODO: Pass these as env var
 	})
@@ -143,7 +144,6 @@ func (rc *RoomController) HandleWebSocket(w http.ResponseWriter, r *http.Request
 
 	room := rc.RoomsManager.GetUserRoom(*user.ID)
 	if room != nil {
-		go user.ReadSocket()
 		user.Room_ch <- room
 	} else {
 		log.Printf("Not in a room, goroutine not started. %s\n", user.ID)

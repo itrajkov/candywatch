@@ -44,14 +44,17 @@ func (u *UserSession) ReadSocket() {
 	}()
 
 	var room *Room
+
+	log.Println("Starting read loop")
 readLoop:
 	for {
+		log.Println("In loop")
 		select {
 		case r := <-u.Room_ch:
+			log.Println("Got a new room")
 			room = r
 		default:
 			{
-
 				ctx, cancel := context.WithCancel(context.Background())
 				defer cancel()
 				_, payload, err := u.socket.Read(ctx)
